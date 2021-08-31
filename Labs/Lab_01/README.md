@@ -1,6 +1,6 @@
 ## Lab 1: Submitting Homework on GitHub
 
-We will first practice how to pull, work on and submit your homework on github. We have set up a  homework #1 repo for you. Go to the [datasciencelabs-student github page](https://github.com/datasciencelabs-students) and look for a repository named `<your GitHub username>-2020HW1`. Click on the repository and follow the next steps below.
+We will first practice how to pull, work on and submit your homework on github. We have set up a  homework #1 repo for you. Go to the [datasciencelabs-student github page](https://github.com/datasciencelabs-students) and look for a repository named `<your GitHub username>-2021HW1`. Click on the repository and follow the next steps below.
 
 
 1. Copy the link near the top of the page that is revealed after clicking 'clone or download'.
