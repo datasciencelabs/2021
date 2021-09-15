@@ -201,7 +201,7 @@ test_1 <- as.numeric(test_1)
 But we get a warning that NAs are produced. What is wrong? Look at the entry for Illinois:
 
 ```{r}
-murders_raw[14,]
+murders_raw[13,]
 ```
 
 The population value for this row doesn't just contain commas, it contains `[5]` - the result of a reference added for this value in the table on Wikipedia. We first need to remove these three characters and then the commas and then convert the values to integers. 
