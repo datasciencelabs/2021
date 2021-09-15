@@ -484,7 +484,7 @@ In this case `123` does **not** match, but `12` does. So now to look for our fee
 With what we have learned we can now construct an example for the pattern `x'y\"` with `x` feet and `y` inches.
 
 ```{r}
-pattern <- ""
+pattern <- "^[4-7]'\\d{1,2}\"$"
 ```
 
 
@@ -564,7 +564,7 @@ identical("Hi", "Hi ")
 In regex, **`\s` represents white space**. So to find patterns like `5' 4`, we can change our pattern to
 
 ```{r}
-pattern_2 <- ""
+pattern_2 <- "^[4-7]'\\s\\d{1,2}\"$"
 str_subset(problems, pattern_2)
 ```
 
@@ -779,7 +779,7 @@ It is not necessarily clear that it is worth writing code to handle all these ca
 
 #### Using groups and qunatifiers:
 
-For case 1 if we add a `'0` to first zero, for example, convert all `6` to `6'0`, then our pattern will match. This can be done using groups 
+For case 1 if we add a `'0` to first zero, for example, convert all `6` to `6'0`, then our pattern will match. This can be done using groups. 
 
 ```{r}
 yes <- c("5", "6", "5")
