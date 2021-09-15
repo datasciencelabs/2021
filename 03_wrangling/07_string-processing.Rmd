@@ -276,7 +276,9 @@ sum(is.na(x))
 We can see some of the entries that are not successfully converted by `filter` to keep only the entries resulting in `NA`s:
 
 ```{r, warning=FALSE}
-
+reported_heights %>% mutate(new_height = as.numeric(height)) %>%
+                     filter(is.na(new_height)) %>% 
+                     head(n = 10)
 ```
 
 We immediately see what is happening. Some of the students did not report their heights in inches as requested. We could discard these data and continue. However, many of the entries follow patterns that, in principle, we can easily convert to inches. For example, in the output above we see various cases that use the format `x'y''` with `x` and `y` representing feet and inches respectively. Each one of these cases can be read and converted to inches by a human, for example `5'4''` is `5*12 + 4 = 64`. So we could fix all the problematic entries _by hand_.
