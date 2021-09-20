@@ -785,7 +785,7 @@ For case 1 if we add a `'0` to first zero, for example, convert all `6` to `6'0`
 yes <- c("5", "6", "5")
 no  <- c("5'", "5''", "5'4")
 s   <- c(yes, no)
-str_replace(s, "^([4-7])$", "\\1'0")
+str_replace(s, "^([56])$", "\\1'0")
 ```
 
 The pattern says it has to start (`^`) followed from a digit between 4 and 7 and end there (`$`). The parenthesis defines the group that we pass as `\\1` to the replace regex. 
@@ -967,6 +967,7 @@ new_heights <- reported_heights %>%
     !is.na(guess) & inches < 12 & between(guess, smallest, tallest) ~ guess, #feet'inches
     TRUE ~ as.numeric(NA))) %>%
   select(-guess)
+head(new_heights)
 ```
 
 We can check all the entries we converted by typing:
@@ -976,7 +977,7 @@ new_heights %>%
   filter(not_inches(original)) %>%
   select(original, height) %>% 
   arrange(height) %>%
-  View()
+  head()
 ```
 
 
@@ -1023,7 +1024,7 @@ x <- x[-1]
 head(x)
 ```
 
-To covert our list into a data frame we can use a shortcut provided by the `map` functions in the purrr package. **The map function applies the same function to each element in a list**. So if we want to extract the first entry of each element in `x` we can write
+To covert our list into a data frame we can use a shortcut provided by the `map` function in the purrr package. **The map function applies the same function to each element in a list**. So if we want to extract the first entry of each element in `x` we can write
 
 ```{r}
 library(purrr)
@@ -1036,7 +1037,7 @@ However, because this is such a common task, `purrr` provides a shortcut: if the
 map(x, 1) %>% head()
 ```
 
-For map to return a character vector instead of a list, we can use `map_chr`. Similary, `map_int` returns integers. So to create our data frame we can use:
+For map to return a character vector instead of a list, we can use `map_chr`. Similarly, `map_int` returns integers. So to create our data frame we can use:
 
 
 ```{r}
@@ -1066,7 +1067,7 @@ It turns out we can use the function argument `simplify=TRUE` to have `str_split
 x <- str_split(lines, ",", simplify = TRUE) 
 col_names <- x[1,]
 x <- x[-1,]
-x <- x %>% as_data_frame() %>%
+x <- x %>% as_tibble() %>%
   setNames(col_names) %>%
   mutate_all(parse_guess)
 head(x)
@@ -1083,6 +1084,7 @@ research_funding_rates
 ```
 
 The data comes from a [paper](http://www.pnas.org/content/112/40/12349.abstract) published in the prestigious journal PNAS. However, the data is not provided in a spreadsheet, it is in a table in a PDF document:
+
 ```{r, echo=FALSE}
 knitr::include_graphics("pnas-table-s1.png")
 ```
