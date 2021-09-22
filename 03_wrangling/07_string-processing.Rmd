@@ -972,7 +972,7 @@ head(new_heights)
 
 We can check all the entries we converted by typing:
 
-```{r, eval=FALSE}
+```{r}
 new_heights %>%
   filter(not_inches(original)) %>%
   select(original, height) %>% 
