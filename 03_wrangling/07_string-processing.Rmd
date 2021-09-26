@@ -671,30 +671,6 @@ We can use this to convert cases in our reported heights.
 
 Now we are ready to define a pattern that helps us convert all the `x.y`, `x,y` and `x y` to our preferred format. We need to adapt `pattern_with_groups` to be bit more flexible and capture all the cases.
 
-
-```{r, eval=FALSE}
-pattern_with_groups <-""
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
 pattern_with_groups <-"^([4-7])\\s*[,\\.\\s+]\\s*(\\d*)$"
 ```
@@ -711,6 +687,7 @@ Let's break this one down:
 - `$` = end of the string
 
 We can see that it appears to be working:
+
 ```{r}
 str_subset(problems, pattern_with_groups) %>% head
 ```
@@ -756,6 +733,7 @@ converted <- problems %>%
 
 pattern <- "^[4-7]\\s*'\\s*\\d{1,2}$"
 index <- str_detect(converted, pattern)
+sum(index)
 mean(index)
 ```
 
@@ -770,7 +748,7 @@ Four clear patterns arise and some other minor problems:
 1. Many students measuring exactly 5 or 6 feet did not enter any inches, for example `6'` and our pattern requires that inches be included. 
 2. Some students measuring exactly 5 or 6 feet entered just that number.
 3. Some of the inches were entered with decimal points. For example `5'7.5''`. Our pattern only looks for two digits.
-4. Some entires have spaces at the end, for example `5 ' 9 `
+4. Some entries have spaces at the end, for example `5 ' 9 `
 5. Some entries are in meters and some of these use European decimals: `1.6`, `1,7`. 
 6. Two students added `cm`. 
 7. A student spelled out the numbers: `Five foot eight inches`
@@ -785,6 +763,7 @@ For case 1 if we add a `'0` to first zero, for example, convert all `6` to `6'0`
 yes <- c("5", "6", "5")
 no  <- c("5'", "5''", "5'4")
 s   <- c(yes, no)
+s
 str_replace(s, "^([56])$", "\\1'0")
 ```
 
@@ -808,7 +787,7 @@ pattern <- "^[4-7]\\s*'\\s*(\\d+\\.?\\d*)$"
 ```
 
 
-Case 4, meters using commas, we can approach similarly to how we converted the `x.y` to `x'y`. A difference is that we require that the first digit is 1 or 2:
+Case 5, meters using commas, we can approach similarly to how we converted the `x.y` to `x'y`. A difference is that we require that the first digit is 1 or 2:
 
 ```{r}
 yes <- c("1,7", "1, 8", "2, " )
@@ -832,7 +811,7 @@ identical(s, "Hi")
 This is a general enough problem that there is a function dedicated to removing them: `str_trim`.
 
 ```{r}
-str_trim("5 ' 9 ")
+str_trim("       5 ' 9 ")
 ```
 
 
@@ -887,10 +866,9 @@ Now we can see which problematic entries remain:
 
 ```{r}
 converted <- problems %>% words_to_numbers %>% convert_format
-remaining_problems <- converted[not_inches_or_cm(converted)]
 pattern <- "^[4-7]\\s*'\\s*\\d+\\.?\\d*$"
-index <- str_detect(remaining_problems, pattern)
-remaining_problems[!index]
+index <- str_detect(converted, pattern)
+converted[!index]
 ```
 
 they all seem to be cases that are not convertable.
@@ -903,6 +881,7 @@ If we have a simpler case like this
 ```{r}
 s   <- c("5'10", "6'1")
 tab <- data.frame(x = s)
+tab
 ```
 
 we have already learned to use the separate function:
@@ -922,6 +901,7 @@ So why do we even need the new function `extract`? We have seen how small change
 ```{r}
 s   <- c("5'10", "6'1\"","5'8inches")
 tab <- data.frame(x = s)
+tab
 ```
 
 And we only want the numbers, separate fails:
@@ -975,7 +955,6 @@ We can check all the entries we converted by typing:
 ```{r}
 new_heights %>%
   filter(not_inches(original)) %>%
-  select(original, height) %>% 
   arrange(height) %>%
   head()
 ```
@@ -1091,15 +1070,22 @@ knitr::include_graphics("pnas-table-s1.png")
 
 We could extract the numbers by hand, but this could lead to human error. Instead we can try to wrangle the data using R. We start by downloading the pdf document then importing into R:
 
-```{r, eval=FALSE}
+```{r}
 library("pdftools")
+
 temp_file <- tempfile()
 url <- "http://www.pnas.org/content/suppl/2015/09/16/1510159112.DCSupplemental/pnas.201510159SI.pdf"
 download.file(url, temp_file)
+
 # For Windows: download.file(url, temp_file, mode="wb")
 txt <- pdf_text(temp_file)
 file.remove(temp_file)
 ```
+
+```{r}
+txt
+```
+
 
 If we examine the object text we notice that it is a character vector with an entry for each page. So we keep the page we want:
 
@@ -1123,6 +1109,7 @@ we see that it is a long string and each line on the page, including the table r
 
 ```{r}
 tab <- str_split(raw_data_research_funding_rates, "\n")
+tab
 ```
 
 Because we start off with just one element in the string we end up with a list with just one entry.
@@ -1183,6 +1170,10 @@ Now we can join these to generate one name for each column:
 
 ```{r}
 tmp_names <- str_c(rep(the_names_1, each = 3), the_names_2[-1], sep = "_")
+tmp_names
+```
+
+```{r}
 the_names <- c(the_names_2[1], tmp_names) %>%
   str_to_lower() %>%
   str_replace_all("\\s", "_")
