@@ -218,6 +218,8 @@ Note that we can drop the `x = ` and `y =` if we wanted to as these are the firs
 Also note that we can add a layer to the `p` object that was defined above as `p <- ggplot(data = murders)`:
 
 ```{r}
+p <- murders %>% ggplot()
+
 p + geom_point(aes(population/10^6, total))
 ```
 
@@ -268,7 +270,7 @@ Now that the points are larger, it is hard to see the labels. If we read the hel
 
 ```{r}
 p + geom_point(aes(population/10^6, total), size = 3) +
-    geom_text(aes(population/10^6, total, label = abb), nudge_x = 2)
+    geom_text(aes(population/10^6, total, label = abb), nudge_x = 3)
 ```
 
 This is preferred as it makes it easier to read the text.
@@ -342,7 +344,8 @@ p + geom_point(size = 3) +
     scale_y_log10() +
     xlab("Populations in millions (log scale)") + 
     ylab("Total number of murders (log scale)") +
-    ggtitle("US Gun Murders in 2010")
+    ggtitle("US Gun Murders in 2010") +
+    theme(plot.title = element_text(hjust = 0.5))
 ```
 
 We are almost there! All we have to do is add color, a legend and optional changes to the style.
@@ -387,6 +390,7 @@ We want to add a line that represents the average murder rate for the entire cou
 ```{r}
 r <- murders %>% 
      summarize(murder_rate = sum(total) /  sum(population) * 10^6) %>% .$murder_rate
+r
 ```
 
 To add a line we use the `geom_abline` function. `ggplot` uses `ab` in the name to remind us we are supplying the intercept (`a`) and slope (`b`). The default line has slope 1 and intercept 0 so we only have to define the intercept:

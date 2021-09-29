@@ -117,7 +117,7 @@ We see a plot for each continent/year pair. However, this is just an example, an
 filter(gapminder, year %in% c(1962, 2012)) %>%
   ggplot(aes(fertility, life_expectancy, color = continent)) +
   geom_point() +
-  facet_grid( . ~ year)
+  facet_grid(. ~ year)
 ```
 
 This plot clearly shows that the majority of countries have moved from the _developing world_ cluster to the _western world_ one. In 2012, the western versus developing world view no longer makes sense. This is particularly clear when comparing Europe to Asia, which includes several countries that have made great improvements. 
@@ -134,7 +134,7 @@ gapminder %>%
   filter(year %in% years & continent %in% continents) %>%
   ggplot(aes(fertility, life_expectancy, color = continent)) +
   geom_point() +
-  facet_wrap(~year) 
+  facet_wrap(. ~ year) 
 ```
 
 This plot clearly shows how most Asian countries have improved at a much faster rate than European ones.
@@ -559,7 +559,7 @@ which make it appear as if there are the same number of countries in each group.
 
 To have the areas of these densities be proportional to the size of the groups, we can simply multiply the y-axis values by the size of the group. From the `geom_density` help file we see that the function computes a variable called `count` that does exactly this. We want this variable to be on the y-axis rather than the density.
 
-In ggplot we access these variables by surrounding them the name by `..` (two periods). So we will use the following mapping:
+In ggplot we access these variables by surrounding `count` by `..` (two periods). So we will use the following mapping:
 
 ```{r, eval=FALSE}
 aes(x = dollars_per_day, y = ..count..)
