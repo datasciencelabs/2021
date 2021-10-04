@@ -78,7 +78,7 @@ The first plot we make to see what data have to say about this world view is a s
 ```{r, warning=FALSE}
 ds_theme_set()
 
-filter(gapminder, year == 1962) %>%
+gapminder %>% filter(year == 1962) %>%
   ggplot(aes(fertility, life_expectancy)) +
   geom_point()
 ```
@@ -105,7 +105,7 @@ We could easily plot the 2012 data in the same way we did for 1962. But to compa
 To achieve faceting we add a layer with the function `facet_grid`, which automatically separates the plots. This function lets you facet by up to two variables using columns to represent one variable and rows to represent the other. The function expects the row and column variables separated by a `~`. Here is an example of a scatter plot with `facet_grid` added as the last layer:
 
 ```{r, warning=FALSE}
-filter(gapminder, year %in% c(1962, 2012)) %>%
+gapminder %>% filter(year %in% c(1962, 2012)) %>%
   ggplot(aes(fertility, life_expectancy, color = continent)) +
   geom_point() +
   facet_grid(continent~year)
@@ -148,9 +148,11 @@ library(gridExtra)
 p1 <- filter(gapminder, year == 1962) %>%
   ggplot(aes(fertility, life_expectancy, col = continent)) +
   geom_point() 
+
 p2 <- filter(gapminder, year == 2012) %>%
   ggplot(aes(fertility, life_expectancy, col = continent)) +
   geom_point() 
+
 grid.arrange(p1, p2, ncol = 2)
 ```
 
@@ -175,7 +177,8 @@ When the points are regularly and densly spaced, as they are here, we create cur
 ```{r, warning=FALSE}
 gapminder %>% filter(country == "United States") %>% 
   ggplot(aes(year,fertility)) +
-  geom_line()
+  geom_line() +
+  geom_point()
 ```
 
 This is particularly helpful when we look at two countries. If we subset the data to include two countries, one from Europe and one from Asia, then copy the code above:
@@ -217,7 +220,7 @@ We demonstrate how we can do this using the life expectancy data. We define a da
 
 ```{r}
 labels <- data.frame(country = countries, x = c(1975, 1965), y = c(60, 72))
-
+labels
 gapminder %>% filter(country %in% countries) %>% 
   ggplot(aes(year, life_expectancy, color = country)) +
   geom_line() +
@@ -254,7 +257,7 @@ past_year <- 1970
 gapminder %>% 
   filter(year == past_year & !is.na(gdp)) %>%
   ggplot(aes(dollars_per_day)) + 
-  geom_histogram(binwidth = 1, color = "black")
+  geom_histogram(binwidth = 1, color = "black", fill = "green")
 ```
 
 We use the `color = "black"` argument to draw a boundary and clearly distinguish the bins.
@@ -334,6 +337,7 @@ The histogram showed us that the income distribution values show a dichotomy. Ho
 To see distributions by geographical region we first stratify the data into regions, and then examine the distribution for each. Because of the number of regions,
 
 ```{r}
+levels(gapminder$region)
 length(levels(gapminder$region))
 ```
 
@@ -499,6 +503,25 @@ gapminder %>%
   filter(year %in% c(past_year, present_year) & country %in% country_list) %>%
   mutate(year = ifelse(year == past_year, "past", "present")) %>%
   select(country, region, continent, year, dollars_per_day) %>%
+  head()
+```
+
+```{r, echo=FALSE}
+gapminder %>% 
+  filter(year %in% c(past_year, present_year) & country %in% country_list) %>%
+  mutate(year = ifelse(year == past_year, "past", "present")) %>%
+  select(country, region, continent, year, dollars_per_day) %>%
+  spread(year, dollars_per_day) %>%
+  head()
+```
+
+
+
+```{r, echo=FALSE}
+gapminder %>% 
+  filter(year %in% c(past_year, present_year) & country %in% country_list) %>%
+  mutate(year = ifelse(year == past_year, "past", "present")) %>%
+  select(country, region, continent, year, dollars_per_day) %>%
   spread(year, dollars_per_day)  %>%
   mutate(difference = present/past) %>%
   mutate(region = reorder(region, difference, FUN = median)) %>%
@@ -509,13 +532,17 @@ gapminder %>%
   xlab("") + ylab("Fold Increase Between 1970 and 2010") +
   scale_y_continuous(trans = "log2")  
 ```
+
+
+To make the y-axis label general we could use the `paste` function:
+
 ```{r}
 ylab(paste("Fold Increase Between", past_year, "and", present_year))
 ```
   
 ### Smooth Density Plots
 
-We have used data exploration to discover that income gap between rich and poor countries has closed considerably during the last 40 years. We used a series of histograms and boxplots to see this. Here we suggest a succint way to convey this message with just one plot. We will use smooth density plots.
+We have used data exploration to discover that income gap between rich and poor countries has closed considerably during the last 40 years. We used a series of histograms and boxplots to see this. Here we suggest a succinct way to convey this message with just one plot. We will use smooth density plots.
 
 Let's start by noting that  density plots for income distribution in `r past_year` and `r present_year` deliver the message that the gap is closing:
 
@@ -691,7 +718,7 @@ surv_income %>% ggplot(aes(income, infant_survival_rate, label = group, color = 
   geom_label(size = 3, show.legend = FALSE)
 ```
 
-In this plot we introduce the use of the `limit` argument  which lets us change the range of the axes. We are making the range larger than the data needs because we will later compare this plot to one with more variability and we want the ranges to be the same. We also introduce the `breaks` argument which lets us set the location of the axis labels. Finally we introduce a new transformation, the logistic transformation.
+In this plot we introduce the use of the `limit` argument  which lets us change the range of the axes. We are making the range larger than the data needs because we will later compare this plot to one with more variability and we want the ranges to be the same. We also introduce the `breaks` argument which lets us set the location of the axis tick labels. Finally we introduce a new transformation, the logistic transformation.
 
 #### Logistic transformation
 The logistic or logit transformation for a proportion or rate $p$ is defined as 
@@ -699,7 +726,7 @@ The logistic or logit transformation for a proportion or rate $p$ is defined as
 $$f(p) = \log \left( \frac{p}{1-p} \right)$$
 
 
-When $p$ is a proportion or probability, the quantity that is being logged, $p/(1-p)$ is called the _odds_. In this case $p$ is the proportion of children that survived. The odds tell us how many more children are expcted to survive than to die. The log transformation makes this symmetric. If the rates are the same, then the log odds is 0. Fold increases or decreases turn into positive and negative increments respectively.
+When $p$ is a proportion or probability, the quantity that is being logged, $p/(1-p)$ is called the _odds_. In this case $p$ is the proportion of children that survived. The odds tell us how many more children are expected to survive than to die. The log transformation makes this symmetric. If the rates are the same, then the log odds is 0. Fold increases or decreases turn into positive and negative increments respectively.
 
 This scale is useful when we want to highlight differences near 0 or 1. For survival rates this is important because a survival rate of 90% is unacceptable, while a survival of 99% is relatively good. We would much prefer a survival rate closer to 99.9%. We want our scale to highlight these differences and the logit does this. Note that 99.9/0.1 is about 10 times bigger than 99/1 which is about 10 times larger than 90/10. And by using the log, these fold changes turn into constant increases.
 
