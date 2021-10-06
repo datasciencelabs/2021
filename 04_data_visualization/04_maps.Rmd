@@ -194,6 +194,7 @@ GeorgiaCounty <- map_data("county", "georgia")
 head(GeorgiaCounty)
 ```
 
+
 Then we plot the state and counties without any axes or background color or grid lines. For now the counties are white with black outlines, we'll change this to depend on the number of cases. We'll also produce 2 plots of Georgia counties, one for July 2nd and one for July 17th. 
 
 ```{r}
@@ -221,8 +222,8 @@ We can see we have more data than we need since we are focusing on Georgia and o
 
 ```{r}
 dates <- c(ymd("2020-07-02", "2020-07-17"))
-georgia_cases <- cases %>% filter(state == "Georgia",
-                                  date %in% dates)
+georgia_cases <- cases %>% filter(state == "Georgia", date %in% dates)
+
 dim(georgia_cases)
 head(georgia_cases)
 ```
@@ -261,13 +262,61 @@ We have one more join to do before we can create the plot. The `data_full` data 
 
 ```{r}
 georgia_map <- data_full %>% mutate(county = str_to_lower(county)) %>%
-                             left_join(GeorgiaCounty, by = c("county" = "subregion"))
+  left_join(GeorgiaCounty, by = c("county" = "subregion"))
 
 dim(georgia_map)
 head(georgia_map)
 ```
 
 Now we are ready to start plotting. Before we specify the cutoffs and colors we want, let's create the default version of the plot with counties filled by case rate and a subplot for each date. Note that we need to remove the `fill = "white"` code we used earlier. 
+
+
+```{r}
+georgia_map %>% ggplot(aes(x = long, y = lat, group = group, fill = rate)) + 
+                geom_polygon(color = "black") +
+                theme(panel.grid.major = element_blank(), 
+                      panel.background = element_blank(),
+                      axis.title = element_blank(), 
+                      axis.text = element_blank(),
+                      axis.ticks = element_blank()) +
+                coord_fixed(1.3) +
+                facet_grid( ~ date)
+  
+```
+One thing we notice is that one county is white - it's missing rate data. On closer inspection of the `GeorgiaCounty` and `georgia_cases` data frames, we notice that DeKalb county is saved as "de kalb" in the `GeorgiaCounty` data frame, but as "DeKalb" in the in the `georgia_cases` data frame. That extra space means that even if we make all letters lowercase, `de kalb` and `dekalb` won't match and when we join the data frames, DeKalb county will be missing rate data. We need to remove the space in the `GeorgiaCouunty` data frame and then join the data frames again.
+
+```{r}
+GeorgiaCounty <- GeorgiaCounty %>%
+  mutate(subregion = str_replace(subregion, " ", ""))
+
+georgia_map <- data_full %>% mutate(county = str_to_lower(county)) %>%
+  left_join(GeorgiaCounty, by = c("county" = "subregion"))
+
+head(georgia_map)
+```
+
+```{r}
+georgia_map %>% ggplot(aes(x = long, y = lat, group = group, fill = rate)) + 
+                geom_polygon(color = "black") +
+                theme(panel.grid.major = element_blank(), 
+                      panel.background = element_blank(),
+                      axis.title = element_blank(), 
+                      axis.text = element_blank(),
+                      axis.ticks = element_blank()) +
+                coord_fixed(1.3) +
+                facet_grid( ~ date)
+  
+```
+
+Uh oh. It's happened again but with 2 different counties. The names of the counties are not matching up again. Looking at a map of Georgia counties we can match the white counties to Ben Hill and Jeff Davis. Both of these had spaces in the `GeorgiaCounty` and `georgia_map` data (and thus matched), but we removed the spaces and now they don't match. We have 2 options: remove all spaces in both data frames, or go back and only remove the space in DeKalb. Since we don't need the names of the counties in this map, let's remove all spaces fromm both data frames.
+
+```{r}
+data_full <- data_full %>%
+  mutate(county = str_replace(county, " ", ""))
+
+georgia_map <- data_full %>% mutate(county = str_to_lower(county)) %>%
+  left_join(GeorgiaCounty, by = c("county" = "subregion"))
+```
 
 
 ```{r}
