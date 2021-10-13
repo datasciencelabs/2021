@@ -569,32 +569,34 @@ present_year <- 2010
 
 dat <- gapminder %>%
   mutate(region = case_when(
-    .$region %in% west ~ "The West",
-    .$region %in% "Northern Africa" ~ "Northern Africa",
-    .$region %in% c("Eastern Asia", "South-Eastern Asia") ~ "East Asia",
-    .$region == "Southern Asia"~ "Southern Asia",
-    .$region %in% c("Central America", "South America", "Caribbean") ~ "Latin America",
-    .$continent == "Africa" & .$region != "Northern Africa" ~ "Sub-Saharan Africa",
-    .$region %in% c("Melanesia", "Micronesia", "Polynesia") ~ "Pacific Islands"),
+    region %in% west ~ "The West",
+    region %in% "Northern Africa" ~ "Northern Africa",
+    region %in% c("Eastern Asia", "South-Eastern Asia") ~ "East Asia",
+    region == "Southern Asia"~ "Southern Asia",
+    region %in% c("Central America", "South America", "Caribbean") ~ "Latin America",
+    continent == "Africa" & .$region != "Northern Africa" ~ "Sub-Saharan Africa",
+    region %in% c("Melanesia", "Micronesia", "Polynesia") ~ "Pacific Islands"),
     dollars_per_day = gdp / population / 365) %>%
   filter(year %in% present_year & !is.na(gdp) & !is.na(infant_mortality) & !is.na(region) ) %>%
-  mutate(OPEC = ifelse(country%in%opec, "Yes", "No")) 
+  mutate(OPEC = ifelse(country %in% opec, "Yes", "No")) 
 
 dat %>% 
   ggplot(aes(dollars_per_day, 1 - infant_mortality/1000, 
              col = region, size = population/10^6,
-             pch =  OPEC)) +
+             shape =  OPEC)) +
   scale_x_continuous(trans = "log2", limits=c(0.25, 150)) +
   scale_y_continuous(trans = "logit",limit=c(0.875, .9981),
                      breaks=c(.85,.90,.95,.99,.995,.998)) + 
   geom_point(alpha = 0.5) 
+
 ```
+
 
 Note that we encode categorical variables with color, hue, and shape. The shape can be controlled with the `shape` argument. Below are the shapes available for use in R. Note that for the last five, the color goes inside. 
 
 
 ```{r, echo=FALSE}
-dat=data.frame(x=c(0:25))
+dat2=data.frame(x=c(0:25))
 ggplot() +
   theme_minimal() +
   theme(axis.title.x=element_blank(),
@@ -606,8 +608,22 @@ ggplot() +
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank()) +
 scale_shape_identity() + scale_y_reverse() +
-geom_point(dat, mapping=aes(x%%9, x%/%9, shape=x), size=10, fill="blue") +
-geom_text(dat, mapping=aes(x%%9, x%/%9+0.25, label=x), size=6) 
+geom_point(dat2, mapping=aes(x%%9, x%/%9, shape=x), size=10, fill="blue") +
+geom_text(dat2, mapping=aes(x%%9, x%/%9+0.25, label=x), size=6) 
+```
+
+The default shape values are a circle and a triangle for OPEC membership. We can manually customize these by adding the layer `scale_shape_manual(values = c(8, 10))`, where 8 and 10 are the numbers of the desired shapes from the list above.
+
+```{r}
+dat %>% 
+  ggplot(aes(dollars_per_day, 1 - infant_mortality/1000, 
+             col = region, size = population/10^6,
+             shape =  OPEC)) +
+  scale_x_continuous(trans = "log2", limits=c(0.25, 150)) +
+  scale_y_continuous(trans = "logit",limit=c(0.875, .9981),
+                     breaks=c(.85,.90,.95,.99,.995,.998)) + 
+  geom_point(alpha = 0.5) +
+  scale_shape_manual(values = c(8, 10))
 ```
 
 For continuous variables we can use color, intensity or size. We now show an example of how we do this with a case study.
