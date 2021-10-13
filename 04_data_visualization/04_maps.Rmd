@@ -258,7 +258,7 @@ data_full <- data_full %>% mutate(rate = 100000*(cases/population))
 head(data_full)
 ```
 
-We have one more join to do before we can create the plot. The `data_full` data frame needs to be joined to the `GeorgiaCounty` data frame we created earlier that contains the counties and dates we want to plot. Before we can join, look at the `county` column in `data_full` and `subregion` column in `GeorgiaCounty`. These are both referring to the counties in Georgia, but the `county` entries are capitalized while `subregion` entries are not. If we want to join these data frames, the quickest way will be to make the `county` column entries lowercase using `str_to_lower` and then joining.
+We have one more join to do before we can create the plot. The `data_full` data frame needs to be joined to the `GeorgiaCounty` data frame we created earlier that contains the mapping data for the counties. Before we can join, look at the `county` column in `data_full` and `subregion` column in `GeorgiaCounty`. These are both referring to the counties in Georgia, but the `county` entries are capitalized while `subregion` entries are not. If we want to join these data frames, the quickest way will be to make the `county` column entries lowercase using `str_to_lower` and then joining.
 
 ```{r}
 georgia_map <- data_full %>% mutate(county = str_to_lower(county)) %>%
@@ -283,7 +283,8 @@ georgia_map %>% ggplot(aes(x = long, y = lat, group = group, fill = rate)) +
                 facet_grid( ~ date)
   
 ```
-One thing we notice is that one county is white - it's missing rate data. On closer inspection of the `GeorgiaCounty` and `georgia_cases` data frames, we notice that DeKalb county is saved as "de kalb" in the `GeorgiaCounty` data frame, but as "DeKalb" in the in the `georgia_cases` data frame. That extra space means that even if we make all letters lowercase, `de kalb` and `dekalb` won't match and when we join the data frames, DeKalb county will be missing rate data. We need to remove the space in the `GeorgiaCouunty` data frame and then join the data frames again.
+
+One thing we notice is that one county is white - it's missing rate data. On closer inspection of the `GeorgiaCounty` and `georgia_cases` data frames, we notice that DeKalb county is saved as "de kalb" in the `GeorgiaCounty` data frame, but as "DeKalb" in the in the `georgia_cases` data frame. That extra space means that even if we make all letters lowercase, `de kalb` and `dekalb` won't match and when we join the data frames, DeKalb county will be missing rate data. We need to remove the space in the `GeorgiaCounty` data frame and then join the data frames again.
 
 ```{r}
 GeorgiaCounty <- GeorgiaCounty %>%
@@ -308,7 +309,7 @@ georgia_map %>% ggplot(aes(x = long, y = lat, group = group, fill = rate)) +
   
 ```
 
-Uh oh. It's happened again but with 2 different counties. The names of the counties are not matching up again. Looking at a map of Georgia counties we can match the white counties to Ben Hill and Jeff Davis. Both of these had spaces in the `GeorgiaCounty` and `georgia_map` data (and thus matched), but we removed the spaces and now they don't match. We have 2 options: remove all spaces in both data frames, or go back and only remove the space in DeKalb. Since we don't need the names of the counties in this map, let's remove all spaces fromm both data frames.
+Uh oh. It's happened again but with 2 different counties. The names of the counties are not matching up again. Looking at a map of Georgia counties we can match the white counties to Ben Hill and Jeff Davis. Both of these had spaces in the `GeorgiaCounty` and `georgia_map` data (and thus matched), but we removed the spaces and now they don't match. We have 2 options: remove all spaces in both data frames, or go back and only remove the space in DeKalb. Since we don't need the names of the counties in this map, let's remove all spaces from both data frames.
 
 ```{r}
 data_full <- data_full %>%
@@ -339,8 +340,9 @@ We'll use the base R `cut` function to specify case rate ranges and create a new
 
 ```{r}
 georgia_map <- georgia_map %>% 
-  mutate(manual_fill = cut(rate, breaks = c(-Inf, 0, 621, 1071, 1623, 2960, Inf),
-                           labels = c("None", "1-620", "621-1,070", "1,071-1,622", "1,623-2,960", ">2,960"),
+  mutate(manual_fill = cut(rate, breaks = c(0, 620, 1070, 1622, 2960, Inf),
+                           labels = c("1-620", "621-1,070", "1,071-1,622", 
+                                      "1,623-2,960", ">2,960"),
                            right = TRUE))
 
 ```
@@ -355,6 +357,9 @@ pal <- c("lightskyblue2", "steelblue2", "dodgerblue3", "dodgerblue4", "red")
 Using `manual_fill` to fill the counties and a `scale_fill_manual` layer specifying the title and labels of the legend, we get the desired result and can now see that the cases have actually increased between July 2nd and July 17th.
 
 ```{r}
+date.labs <- c("July 2, 2020", "July 17, 2020")
+names(date.labs) <- c("2020-07-02", "2020-07-17")
+
 georgia_map %>% ggplot(aes(x = long, y = lat, group = group)) +
   geom_polygon(aes(fill = manual_fill), color = "black")  +
   scale_fill_manual(name = "Cases per 100,000", values = pal) +
@@ -364,7 +369,8 @@ georgia_map %>% ggplot(aes(x = long, y = lat, group = group)) +
         axis.title = element_blank(), 
         axis.text = element_blank(),
         axis.ticks = element_blank()) +
-  facet_grid(. ~ date)
+  ggtitle("COVID-19 Cases per 100K") +
+  facet_grid(. ~ date, labeller = labeller(date = date.labs))
 ```
 
 
@@ -386,6 +392,7 @@ georgia_map_labels <- georgia_map %>%
 
 ```{r}
 library(ggrepel)
+
 georgia_map %>% ggplot(aes(x = long, y = lat)) +
   geom_polygon(aes(fill = manual_fill, group = group), color = "black")  +
   scale_fill_manual(name = "Cases per 100,000", values = pal) +
@@ -396,7 +403,8 @@ georgia_map %>% ggplot(aes(x = long, y = lat)) +
         axis.title = element_blank(), 
         axis.text = element_blank(),
         axis.ticks = element_blank()) +
-  facet_grid(. ~ date)
+  ggtitle("COVID-19 Cases per 100K") +
+  facet_grid(. ~ date, labeller = labeller(date = date.labs))
 
 
 ```
