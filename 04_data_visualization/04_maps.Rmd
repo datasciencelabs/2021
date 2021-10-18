@@ -344,7 +344,7 @@ georgia_map <- georgia_map %>%
                            labels = c("1-620", "621-1,070", "1,071-1,622", 
                                       "1,623-2,960", ">2,960"),
                            right = TRUE))
-
+head(georgia_map)
 ```
 
 One final step before plotting is specifying the colors we want. The colors chosen from [this resource](http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf) are as close as possible to the colors used in the original plots. 
