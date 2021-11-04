@@ -26,7 +26,6 @@ Note: all office hours will be held in-person AND online via Zoom links in Canva
 | Monday   | 1-2pm      | FXB G03 |
 | Monday   | 2-3pm      | FXB G03 |
 | Tuesday   | 11am-12pm   | Kresge 205 |
-| Tuesday   | 2-3pm     | Kresge 205 |
 | Wednesday   | 8:30-9:30am      | Building 1, 4th Floor, Room 421A |
 | Thursday   | 1-2pm    | FXB G03 |
 
