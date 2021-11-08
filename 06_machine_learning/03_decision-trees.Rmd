@@ -161,7 +161,7 @@ plot(fit, type = "uniform")
 text(fit, cex = 1)
 ```
 
-The tree suggests that houses with a higher number of rooms correspond to more expensive houses and predicts a median house price of $47,420. 
+The tree suggests that houses with a higher number of rooms correspond to more expensive houses and predicts a median house price of $45,380 for a house with more than 8 rooms. 
 
 The idea behind the regression tree is that outcome $Y$ is estimated (or predicted) to be it's mean _within each of the data partitions_. Think of it as the conditional mean of $Y$ where conditioning is given by this region partitioning. 
 
@@ -172,7 +172,7 @@ abline(0,1)
 mean((preds-test)^2)
 ```
 
-The test set MSE associated with this tree is 25.05. The square root of the MSE is 5.005, indicating this model leads to test predictions that are within approximately $5,005 of the true median home value for the suburb.
+The test set MSE associated with this tree is 35.29. The square root of the MSE is 5.94, indicating this model leads to test predictions that are within approximately $5,940 of the true median home value for the suburb.
 
 
 The `rpart` package is an alternative method for fitting trees in R. It is much more feature rich, including fitting multiple cost complexities and performing cross-validation by default. It also has the ability to produce much nicer trees. Based on its default settings, it will often result in smaller trees than using the tree package.
@@ -197,6 +197,12 @@ Note that the output indicates only 3 of the predictors were used to construct t
 ```{r}
 rpart.plot(fit_rpart, digits = 4)
 ```
+We get the same predictions as we did using the `tree` function. We can also calculate the MSE and check that it is also the same:
+```{r}
+mean((preds-test)^2)
+```
+
+
 
 ### Specifics of the regression tree algorithm
 
@@ -485,7 +491,7 @@ Let's look at this using the Boston housing dataset. We fit a Random Forest by u
 ```{r, message=FALSE, warning=FALSE}
 library(randomForest)
 library(MASS)
-fit_bag <- randomForest(medv ~ ., data = Boston, mtry = 13)
+fit_bag <- randomForest(medv ~ ., data = Boston[train,], mtry = 13)
 fit_bag
 ```
 
@@ -497,19 +503,20 @@ abline(0,1)
 mean((preds_bag - test)^2)
 ```
 
-Much, much better than the one decision tree we used above. 
+Much, much better than the one decision tree we used above. With Random Forest we get an MSE of 23.4 which (after square rooting) translates to our predictions being within $4,847 of the true median home value for the suburb. 
+This is much lower than the $5,940 we got when using the one decision tree.
 
 We can grow a random forest in the same way, except now we use a smaller value for `mtry`. The default for regression trees is $p/3$ ($p$ is the number of predictors) and the default for classification trees is $\sqrt p$. Let's try `mtry = 6`.
 
 ```{r}
-fit_rf <- randomForest(medv ~ ., data = Boston, mtry = 6, importance = TRUE)
+fit_rf <- randomForest(medv ~ ., data = Boston[train,], mtry = 6, importance = TRUE)
 preds_rf = predict(fit_rf, newdata = Boston[-train,])
 mean((preds_rf - test)^2)
 ```
 
-Looks like the MSE for this random forest is worse with fewer predictors and the one using all of the predictors performs the best.
+Looks like the MSE for this random forest is better with fewer predictors and the one using all of the predictors performs worse.
 
-The second Random Forests feature is to use a random selection of features to split when deciding partitions. Specifically, when building each tree $T_j$, at each recursive partition only consider a _randomly selected subset of predictors_ to check for the best split. This reduces correlation between trees in a forest, improving prediction accuracy.
+The second Random Forest feature is to use a random selection of features to split when deciding partitions. Specifically, when building each tree $T_j$, at each recursive partition only consider a _randomly selected subset of predictors_ to check for the best split. This reduces correlation between trees in a forest, improving prediction accuracy.
 
 Here is the random forest fit for the digits data:
 
@@ -574,7 +581,7 @@ get_accuracy(fit)
 ```
 
 
-A disadvantage of random forests is that we lose interpretability. However, we can use the fact that a bootstrap sample was used to construct trees to measure _variable importance_ from the random forest.
+A disadvantage of random forests is that we lose interpretability. However, we can use the fact that a bootstrap sample was used to construct trees to measure _variable importance_ from the random forest. The importance of a variable translates to how predictive that variable is. 
 
 Let's see this using all the digits data:
 
@@ -604,7 +611,7 @@ Here is a table of _variable importance_ for the random forest we just construct
 ```{r, echo=TRUE, results="asis"}
 library(knitr)
 variable_importance <- importance(fit) 
-tmp <- data_frame(feature = rownames(variable_importance),
+tmp <- tibble(feature = rownames(variable_importance),
                   Gini = variable_importance[,1]) %>%
                   arrange(desc(Gini))
 kable(tmp[1:10,])
