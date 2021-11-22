@@ -698,8 +698,8 @@ Here is a plot of $r_{u,i}$ next to  $\mathbf{p} \mathbf{q}^\top$:
 P <- matrix(c(2, 2, 2, 0, 0, 0, 0, 0, -2, -2, -2, -2), ncol=1)
 Q <- matrix(c(1 , 1, 1, -1, -1), ncol=1)
 pq <- P %*% t(Q)
-image(pq)
-image(r)
+image(t(pq))
+image(t(r))
 ```
 
 
