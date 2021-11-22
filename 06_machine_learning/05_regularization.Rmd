@@ -56,12 +56,11 @@ One of the statistical techniques they used to improve prediction was _regulariz
 
 We start by loading a [large, compressed movie ratings dataset](https://github.com/datasciencelabs/data/blob/master/movielens-train.csv.gz) from IMDB into R. 
 
-```{r, message=FALSE}
-filename <- tempfile()
-url <- "https://github.com/datasciencelabs/data/blob/master/movielens-train.csv.gz?raw=true"
-download.file(url, filename)
-ratings <- read_csv(gzfile(filename)) 
+```{r}
+ratings <- read_csv("movielens-train.csv.gz")
+head(ratings)
 ```
+
 
 This dataset includes the following columns:
 

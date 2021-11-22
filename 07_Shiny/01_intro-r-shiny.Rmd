@@ -9,7 +9,7 @@ Shiny is an R package that makes it easy to build interactive web apps straight 
 
 Today, Shiny is used in many industries. It’s used in academia as a teaching tool for statistical concepts, by big pharma companies to speed collaboration between scientists and analysts during drug development, and by Silicon Valley tech companies to set up realtime metrics dashboards that incorporate advanced analytics.
 
-Great sources for tutorials and learning more about Shiny can be found [here](https://shiny.rstudio.com/tutorial/) and [here](https://mastering-shiny.org/). Our lectures on Shiny are adapted from these sources. A handy [Shiny cheat sheet](https://www.rstudio.com/wp-content/uploads/2015/02/shiny-cheatsheet.pdf) is also available.
+Great sources for tutorials and learning more about Shiny can be found [here](https://shiny.rstudio.com/tutorial/) and [here](https://mastering-shiny.org/). Our lectures on Shiny are adapted from these sources. A handy [Shiny cheat sheet](https://shiny.rstudio.com/images/shiny-cheatsheet.pdf) is also available.
 
 
 ## Creating a Shiny app
@@ -74,7 +74,7 @@ ui <- fluidPage(
 ```
 
 #### Inputs
-You can create an input with an `*Input()` function. There are 12 basic options for inputs included in the shiny library:
+You can create an input with an `Input()` function. There are 12 basic options for inputs included in the shiny library:
 
 * `actionButton()` / `submitButton()`
 * `checkboxInput()`
@@ -126,7 +126,7 @@ Here is what the slider and corresponding syntax looks like:
 #### Outputs
 We have successfully added a slider input to our app. But that alone won't do anything useful. We want that input to inform an output. Output functions in the UI specification create placeholders that are filled by the server function.
 
-Similar to the `*Input()` functions we just saw, there are several basic `*Output()` functions:
+Similar to the `Input()` functions we just saw, there are several basic `*Output()` functions:
 
 * `dataTableOutput()`
 * `htmlOutput()`
