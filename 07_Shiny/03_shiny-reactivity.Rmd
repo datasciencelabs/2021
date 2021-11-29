@@ -318,6 +318,10 @@ server <- function(input, output, session) {
 }
 ```
 
+We can see the `Simulate!` click button now. 
+
+<center><img src="images/simulate_button.png" style="width: 220px;"/></center>
+
 This doesn’t achieve our goal because it just introduces a new dependency: `x1()` and `x2()` will update when we click the simulate button, but they’ll also continue to update when `n1`, `n2`, `mean1`, `mean2`, `sd1`, or `sd2` change. We want to replace the existing dependencies, not add to them.
 
 To solve this problem we need a new tool: a way to use input values without taking a reactive dependency on them. We need `eventReactive()`, which has two arguments: the first argument specifies what to take a dependency on, and the second argument specifies what to compute. That allows this app to only compute `x1()` and `x2()` when simulate is clicked:
