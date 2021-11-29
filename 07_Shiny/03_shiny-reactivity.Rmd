@@ -77,7 +77,7 @@ Because of this duality, some functions work with either reactive inputs or expr
 <center><img src="images/producers_consumers.png" style="width: 400px;"/></center>
 
 ### Example
-Let's look at a concrete example. This example also comes from [Mastering Shiny](https://mastering-shiny.org/basic-reactivity.html) (chapter 4) and the live app can be accessed [here](https://hadley.shinyapps.io/basic-reactivity-cs/).
+Let's look at a concrete example. This example is based on the example from [Mastering Shiny](https://mastering-shiny.org/basic-reactivity.html) (chapter 3) and the live app can be accessed [here](https://hadley.shinyapps.io/basic-reactivity-cs/).
 
 Imagine I want to compare two simulated datasets with a plot and a hypothesis test. I’ve done a little experimentation and decided I want to include a histogram which visualizes the two distributions, and a t-test to compare means and summarize the results with a table. I have created two functions to do this:
 
