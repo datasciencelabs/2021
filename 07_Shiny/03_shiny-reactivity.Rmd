@@ -222,6 +222,128 @@ This transformation yields the substantially simpler graph shown below. This sim
 
 <center><img src="images/sims_graph2.png" style="width: 200px;"/></center>
 
+A better look at what we have done with reactive expressions is to look at the graph in a modular form:
+
+<center><img src="images/modules.png" style="width: 220px;"/></center>
+
+### Setting a timer
+
+Suppose we want to reinforce the fact that this is for simulated data by constantly resimulating the data, so that you see an animation rather than a static. We can increase the frequency of updates with a new function: `reactiveTimer()`.
+
+`reactiveTimer()` is a reactive expression that has a dependency on a hidden input: the current time. You can use a `reactiveTimer()` when you want a reactive expression to invalidate itself (update) more often than it otherwise would. For example, the following code uses an interval of 500 ms so that the plot will update twice a second. This is fast enough to remind you that you’re looking at a simulation, without dizzying you with rapid changes.
+
+```{r, eval=FALSE}
+server <- function(input, output, session) {
+    # Add timer. Here, 500 means update every 500 ms (twice every minute)
+    timer <- reactiveTimer(500)
+    
+    # Define x1 and x2 as reactive expressions
+    x1 <- reactive({
+        timer()
+        rnorm(input$n1, input$mean1, input$sd1)
+        })
+    x2 <- reactive({
+        timer()
+        rnorm(input$n2, input$mean2, input$sd2)
+        })
+    
+    output$hist <- renderPlot({
+        # Use x1 and x2 like functions
+        histogram(x1(), x2(), binwidth = input$binwidth, xlim = input$range)
+    })
+    
+    output$ttest <- renderText({
+        t_test(x1(), x2())
+    })
+}
+```
+
+
+### Using an action button
+
+With the timer above, think about what would happen if the simulation code took 1 second to run. We perform the simulation every 0.5s, so Shiny would have more and more to do, and would never be able to catch up. The same problem can happen if someone is rapidly clicking buttons in your app and the computation you are doing is relatively expensive. It’s possible to create a big backlog of work for Shiny, and while it’s working on the backlog, it can’t respond to any new events. This leads to a poor user experience.
+
+If this situation arises in your app, **you might want to require the user to opt-in to performing the expensive calculation by requiring them to click a button**. This is a great use case for an `actionButton()`:
+
+```{r, eval=FALSE}
+ui <- fluidPage(
+    fluidRow(
+        column(4, 
+               "Distribution 1",
+               numericInput("n1", label = "n", value = 1000, min = 1),
+               numericInput("mean1", label = "µ", value = 0, step = 0.1),
+               numericInput("sd1", label = "σ", value = 0.5, min = 0.1, step = 0.1)
+        ),
+        column(4, 
+               "Distribution 2",
+               numericInput("n2", label = "n", value = 1000, min = 1),
+               numericInput("mean2", label = "µ", value = 0, step = 0.1),
+               numericInput("sd2", label = "σ", value = 0.5, min = 0.1, step = 0.1)
+        ),
+        column(4,
+               "Histogram",
+               numericInput("binwidth", label = "Bin width", value = 0.1, step = 0.1),
+               sliderInput("range", label = "range", value = c(-3, 3), min = -5, max = 5)
+        )
+    ),
+    fluidRow(
+        column(4, actionButton("simulate", "Simulate!"))
+    ),
+    
+    fluidRow(
+        column(9, plotOutput("hist")),
+        column(3, verbatimTextOutput("ttest"))
+    )
+)
+
+server <- function(input, output, session) {
+    # Define x1 and x2 as reactive expressions
+    x1 <- reactive({
+        input$simulate
+        rnorm(input$n1, input$mean1, input$sd1)
+        })
+    x2 <- reactive({
+        input$simulate
+        rnorm(input$n2, input$mean2, input$sd2)
+        })
+    
+    output$hist <- renderPlot({
+        # Use x1 and x2 like functions
+        histogram(x1(), x2(), binwidth = input$binwidth, xlim = input$range)
+    })
+    
+    output$ttest <- renderText({
+        t_test(x1(), x2())
+    })
+}
+```
+
+This doesn’t achieve our goal because it just introduces a new dependency: `x1()` and `x2()` will update when we click the simulate button, but they’ll also continue to update when `n1`, `n2`, `mean1`, `mean2`, `sd1`, or `sd2` change. We want to replace the existing dependencies, not add to them.
+
+To solve this problem we need a new tool: a way to use input values without taking a reactive dependency on them. We need `eventReactive()`, which has two arguments: the first argument specifies what to take a dependency on, and the second argument specifies what to compute. That allows this app to only compute `x1()` and `x2()` when simulate is clicked:
+
+```{r, eval=FALSE}
+server <- function(input, output, session) {
+    # Define x1 and x2 as event reactive expressions
+    x1 <- eventReactive(input$simulate, {
+        rnorm(input$n1, input$mean1, input$sd1)
+    })
+    x2 <- eventReactive(input$simulate, {
+        rnorm(input$n2, input$mean2, input$sd2)
+    })
+    
+    output$hist <- renderPlot({
+        # Use x1 and x2 like functions
+        histogram(x1(), x2(), binwidth = input$binwidth, xlim = input$range)
+    })
+    
+    output$ttest <- renderText({
+        t_test(x1(), x2())
+    })
+}
+```
+
+Basically, the plots won't update even when `n1`, `n2`, `mean1`, `mean2`, `sd1`, or `sd2` change until the `Simulate!` button is pushed. This saves computing time. 
 
 ## Tabs
 You can create an app with different tabs using `tabsetPanel()` and `tabPanel()`. The general layout looks like this:
