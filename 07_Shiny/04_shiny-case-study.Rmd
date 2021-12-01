@@ -4,9 +4,9 @@ output: html_document
 runtime: shiny
 ---
 
-Let's try to make a Shiny app that's a bit more complex. The data we'll be using comes from the [National Electronic Injury Surveillance System (NEISS)](https://www.cpsc.gov/Research--Statistics/NEISS-Injury-Data) that’s collected by Consumer Product Safety Commission (CPSC). The primary purpose of NEISS is to collect data on consumer product-related injuries occurring in the United States. This data is what CPSC uses to produce nationwide estimates of product-related injuries. This is a long-term study that records all accidents seen in a representative sample of hospitals in the United States. It’s an interesting dataset to explore because it’s readily understandable, and each observation is accompanied by a short narrative that explains how the accident occured.
+Let's try to make a Shiny app that's a bit more complex. The data we'll be using comes from the [National Electronic Injury Surveillance System (NEISS)](https://www.cpsc.gov/Research--Statistics/NEISS-Injury-Data) that’s collected by Consumer Product Safety Commission (CPSC). The primary purpose of NEISS is to collect data on consumer product-related injuries occurring in the United States. This data is what CPSC uses to produce nationwide estimates of product-related injuries. This is a long-term study that records all accidents seen in a representative sample of hospitals in the United States. It’s an interesting dataset to explore because it’s readily understandable, and each observation is accompanied by a short narrative that explains how the accident occurred.
 
-We'll also be basing our app on the case study found in Chapter 5 of [Mastering Shiny](https://mastering-shiny.org/) by Hadley Wickham. All of the code and data we use can be found on [GitHub](https://github.com/hadley/neiss).
+We'll also be basing our app on the case study found in Chapter 4 of [Mastering Shiny](https://mastering-shiny.org/) by Hadley Wickham. All of the code and data we use can be found on [GitHub](https://github.com/hadley/neiss).
 
 ```{r, message=FALSE, echo=FALSE, warning=FALSE}
 library(shiny)
@@ -181,9 +181,9 @@ Here is a screenshot of what we've made so far:
 
 Now that we have the basic components in place, and working, we can progressively improve our app. The first problem with this app is that it shows a lot of information in the tables, where we probably just want the highlights. To fix this we need to need to first figure out how to truncate the tables. I’ve chosen to do that with the `fct_lump_n` function: I convert the variable to a factor, order by the frequency of the levels, and then lump together all levels after the top 5. The number 5 is arbitrary - I chose it because I think it looks nice. 
 
-```{r, eval=FALSE}
+```{r}
 injuries %>%
-  mutate(diag = fct_lump_n(5)) %>%
+  mutate(diag = fct_lump_n(diag, 5)) %>%
   group_by(diag) %>%
   summarise(n = as.integer(sum(weight)))
 ```
