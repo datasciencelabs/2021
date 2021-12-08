@@ -271,7 +271,8 @@ output$narrative <- renderText({
 
 ![](images/final_app.png)
 
-Let's put it all together here once again using the `shinyApp()` function. I have also included the stand alone app in the `shiny` folder on [github](https://github.com/datasciencelabs/2019/tree/master/shiny) - it's named `narrative_app.R`.
+Let's put it all together here once again using the `shinyApp()` function.
+
 ```{r}
 library(tidyverse)
 library(vroom)
