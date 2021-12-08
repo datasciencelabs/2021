@@ -13,7 +13,7 @@ library(shiny)
 library(vroom)
 library(tidyverse)
 # install.packages("devtools")
-devtools::install_github("hadley/neiss")
+# devtools::install_github("hadley/neiss")
 ```
 
 
@@ -86,7 +86,7 @@ summary
 ```{r}
 summary %>% ggplot(aes(age, n, colour = sex)) + 
             geom_line() + 
-            labs(y = "Estimated number of injuries")
+            labs(y = "Estimated number of injuries", x = "Age")
 ```
 
 We see a big spike when children are learning to walk, a flattening off over middle age, and then a gradual decline after age 50. Interestingly, the number of injuries is much higher for women.
@@ -105,7 +105,7 @@ Plotting the rate yields a strikingly different trend after age 50: while the nu
 ```{r}
 summary %>% ggplot(aes(age, rate, colour = sex)) + 
             geom_line(na.rm = TRUE) + 
-            labs(y = "Injuries per 10,000 people")
+            labs(y = "Injuries per 10,000 people", x = "Age")
 ```
 
 Finally, we can look at some of the narratives. Browsing through these is an informal way to check our hypotheses, and generate new ideas for further exploration. Here I pull out a random sample of 10:
@@ -164,7 +164,7 @@ server <- function(input, output, session) {
     summary() %>%
       ggplot(aes(age, n, colour = sex)) +
       geom_line() +
-      labs(y = "Estimated number of injuries") +
+      labs(y = "Estimated number of injuries", x = "Age") +
       theme_grey(15)
   })
 }
@@ -234,13 +234,13 @@ Then I condition on that input when generating the plot:
       summary() %>%
         ggplot(aes(age, n, colour = sex)) +
         geom_line() +
-        labs(y = "Estimated number of injuries") +
+        labs(y = "Estimated number of injuries", x = "Age") +
         theme_grey(15)
     } else {
       summary() %>%
         ggplot(aes(age, rate, colour = sex)) +
         geom_line(na.rm = TRUE) +
-        labs(y = "Injuries per 10,000 people") +
+        labs(y = "Injuries per 10,000 people", x = "Age") +
         theme_grey(15)
     }
   })
@@ -345,13 +345,13 @@ server <- function(input, output, session) {
       summary() %>%
         ggplot(aes(age, n, colour = sex)) +
         geom_line() +
-        labs(y = "Estimated number of injuries") +
+        labs(y = "Estimated number of injuries", x = "Age") +
         theme_grey(15)
     } else {
       summary() %>%
         ggplot(aes(age, rate, colour = sex)) +
         geom_line(na.rm = TRUE) +
-        labs(y = "Injuries per 10,000 people") +
+        labs(y = "Injuries per 10,000 people", x = "Age") +
         theme_grey(15)
     }
   })
