@@ -280,8 +280,8 @@ We can also create a nicer looking plot using `ggroc`:
 ggroc(list("QDA" = roc_qda)) +
   theme(legend.title = element_blank()) +
   geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color = "black", linetype = "dashed") +
-  xlab("Sensitivity") +
-  ylab("Specificity") 
+  xlab("Specificity") +
+  ylab("Sensitivity") 
 ```
 
 
@@ -300,8 +300,8 @@ roc_lda <- roc(test_set$y, pred_lda)
 ggroc(list("QDA" = roc_qda, "LDA" = roc_lda)) +
   theme(legend.title = element_blank()) +
   geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color = "black", linetype = "dashed") +
-  xlab("Sensitivity") +
-  ylab("Specificity") 
+  xlab("Specificity") +
+  ylab("Sensitivity") 
 ```
 
 We can also compare to KNN with two different values of `k`: 5 and 51.
@@ -320,8 +320,8 @@ roc_knn_51  <- roc(test_set$y, pred_knn_51)
 ggroc(list("QDA" = roc_qda, "LDA" = roc_lda, "kNN, k = 5" = roc_knn_5, "kNN, k = 51" = roc_knn_51)) +
   theme(legend.title = element_blank()) +
   geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color = "black", linetype = "dashed") +
-  xlab("Sensitivity") +
-  ylab("Specificity")
+  xlab("Specificity") +
+  ylab("Sensitivity")
 ```
 
 To summarize these curves into one single number that can be compared across methods, it is common to take the area under the ROC curve (abbreviated AUC or AUROC). Higher values indicate better performance.
